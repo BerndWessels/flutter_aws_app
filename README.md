@@ -1,16 +1,19 @@
 # flutter_aws_app
 
-A new Flutter application.
+A simple Flutter example app showing how to use
+- AWS Cognito User Management
+- AWS AppSync GraphQL API
+with Flutter
 
-## Getting Started
+This Example uses the AWS Cognito hosted UI to manage all users including federated identities
+within the Cognito User Pool.
 
-This project is a starting point for a Flutter application.
+It still used a Cognito Identity Pool to get IAM access credentials.
 
-A few resources to get you started if this is your first Flutter project:
+To get a better understanding checkout the following links.
 
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
+## More Details
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+- [BFF Back-End for Front-End Architecture](https://medium.com/@wesselsbernd/bff-back-end-for-front-end-architecture-as-of-may-2019-5d09b913a8ed)
+- [Some AWS Cognito & AppSync Details](https://medium.com/@wesselsbernd/some-aws-cognito-appsync-details-as-of-may-2019-247c8531f600)
+- [Flutter and AWS](https://medium.com/@wesselsbernd/flutter-and-aws-as-of-march-2019-1ad7f40fa9e4)
