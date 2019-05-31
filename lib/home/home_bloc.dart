@@ -25,6 +25,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           type
         }
         """,
+        retryCount: 2,
       ); // , cache , retry , pollingInterval
       var response2 = response.rebuild((b) => b..listPets[0] = b.listPets[0].rebuild((b) => b..price += 10));
       print(response);

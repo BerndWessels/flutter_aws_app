@@ -93,8 +93,9 @@ class QueryProvider {
     );
     Query query;
     try {
-      query =
-          standardSerializers.deserializeWith(Query.serializer, data["data"]);
+      query = data == null
+          ? null
+          : standardSerializers.deserializeWith(Query.serializer, data["data"]);
     } catch (e) {
       print(e);
       return null;

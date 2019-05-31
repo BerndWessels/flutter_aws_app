@@ -16,7 +16,17 @@ class QueryRepository extends Repository {
     @required this.identityRepository,
   }) : _queryProvider = QueryProvider(endpoint, region);
 
-  Future<Query> query(String fragment) async {
+  Future<Query> query(String fragment, {int retryCount = -1}) async {
+    Query response;
+    int retry = 0;
+    do {
+      print("try #$retry");
+      response = await _query(fragment);
+    } while (response == null && retry++ < retryCount);
+    return response;
+  }
+
+  Future<Query> _query(String fragment) async {
     var credentials = await identityRepository.credentials;
     if (credentials == null) {
       return null;
