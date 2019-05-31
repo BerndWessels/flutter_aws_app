@@ -227,7 +227,7 @@ class SigV4 {
       buildCanonicalSignedHeaders(headers),
       hexEncode(hash(utf8.encode(payload))),
     ];
-    print(canonicalRequest.join('\n'));
+    // print(canonicalRequest.join('\n'));
     return canonicalRequest.join('\n');
   }
 

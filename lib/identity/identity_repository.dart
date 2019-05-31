@@ -210,6 +210,7 @@ class IdentityRepository extends Repository {
         print(
             "$cognitoUserPoolTokenUrl : $errorType, statusCode: ${response.statusCode}");
       }
+      return null;
     }
 
     var tokens = AuthenticationTokens(
@@ -263,6 +264,7 @@ class IdentityRepository extends Repository {
         print(
             "$cognitoUserPoolTokenUrl : $errorType, statusCode: ${response.statusCode}");
       }
+      return null;
     }
 
     var tokens = AuthenticationTokens(
@@ -312,6 +314,7 @@ class IdentityRepository extends Repository {
         print(
             "$cognitoIdentityPoolUrl : AWSCognitoIdentityService.GetId : $errorType, statusCode: ${response.statusCode}");
       }
+      return null;
     }
     return data["IdentityId"];
   }
@@ -364,6 +367,7 @@ class IdentityRepository extends Repository {
         print(
             "$cognitoIdentityPoolUrl : AWSCognitoIdentityService.GetCredentialsForIdentity : $errorType, statusCode: ${response.statusCode}");
       }
+      return null;
     }
     double expiration = data["Credentials"]["Expiration"];
     var credentials = AuthenticationCredentials(

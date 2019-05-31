@@ -1,25 +1,29 @@
-import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:built_value/built_value.dart';
 
-abstract class AuthenticationEvent extends Equatable {
-  AuthenticationEvent([List props = const []]) : super(props);
+part 'authentication_events.g.dart';
+
+abstract class AuthenticationEvent {}
+
+abstract class AppStarted
+    implements Built<AppStarted, AppStartedBuilder>, AuthenticationEvent {
+  AppStarted._();
+
+  factory AppStarted([void Function(AppStartedBuilder) updates]) = _$AppStarted;
 }
 
-class AppStarted extends AuthenticationEvent {
-  @override
-  String toString() => 'AppStarted';
+abstract class Authenticate
+    implements Built<Authenticate, AuthenticateBuilder>, AuthenticationEvent {
+  Authenticate._();
+
+  factory Authenticate([void Function(AuthenticateBuilder) updates]) =
+      _$Authenticate;
+
+  String get code;
 }
 
-class Authenticate extends AuthenticationEvent {
-  final String code;
+abstract class SignOut
+    implements Built<SignOut, SignOutBuilder>, AuthenticationEvent {
+  SignOut._();
 
-  Authenticate({@required this.code}) : super([code]);
-
-  @override
-  String toString() => 'Authenticate { code: $code }';
-}
-
-class SignOut extends AuthenticationEvent {
-  @override
-  String toString() => 'SignOut';
+  factory SignOut([void Function(SignOutBuilder) updates]) = _$SignOut;
 }

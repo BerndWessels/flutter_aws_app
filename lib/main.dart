@@ -4,11 +4,13 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_aws_app/authentication/authentication.dart';
-import 'package:flutter_aws_app/home.dart';
 import 'package:flutter_aws_app/identity/identity.dart';
+import 'package:flutter_aws_app/packages/query_repository.dart';
 import 'package:flutter_aws_app/packages/repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uni_links/uni_links.dart';
+
+import 'home/home.dart';
 
 class SimpleBlocDelegate extends BlocDelegate {
   @override
@@ -20,7 +22,9 @@ class SimpleBlocDelegate extends BlocDelegate {
 
 // The main entry point of this application.
 void main() async {
+  // Bloc logging.
   BlocSupervisor().delegate = SimpleBlocDelegate();
+  // AWS Cognito.
   IdentityRepository identityRepository = IdentityRepository(
     region: "us-east-1",
     userPoolDomainPrefix: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
@@ -32,14 +36,23 @@ void main() async {
     cognitoUserPoolLogoutRedirectUrl: "https://my.app",
     cognitoUserPoolLoginScopes: "phone email openid profile",
   );
-  runApp(AppPage(identityRepository));
+  // AWS AppSync.
+  QueryRepository queryRepository = QueryRepository(
+    endpoint:
+        "https://xxxxxxxxxxxxxxxxxxxxxxxxxx.appsync-api.us-east-1.amazonaws.com",
+    region: "us-east-1",
+    identityRepository: identityRepository,
+  );
+  // Run the application page.
+  runApp(AppPage(identityRepository, queryRepository));
 }
 
 // The application's main page.
 class AppPage extends StatefulWidget {
   final IdentityRepository identityRepository;
+  final QueryRepository queryRepository;
 
-  AppPage(this.identityRepository);
+  AppPage(this.identityRepository, this.queryRepository);
 
   @override
   _AppPageState createState() => _AppPageState();
@@ -107,6 +120,9 @@ class _AppPageState extends State<AppPage> {
         RepositoryProvider<IdentityRepository>(
           repository: widget.identityRepository,
         ),
+        RepositoryProvider<QueryRepository>(
+          repository: widget.queryRepository,
+        )
       ],
       child: BlocProviderTree(
         blocProviders: [
@@ -135,12 +151,14 @@ class _AppPageState extends State<AppPage> {
                   case '/':
                     return MaterialPageRoute(
                         builder: (context) => HomePage(
-                              title: "MyApp",
+                              title: "Bernd",
                             ));
                   case '/identity/signin':
-                    return MaterialPageRoute(builder: (context) => IdentitySignInPage());
+                    return MaterialPageRoute(
+                        builder: (context) => IdentitySignInPage());
                   case '/identity/signout':
-                    return MaterialPageRoute(builder: (context) => IdentitySignOutPage());
+                    return MaterialPageRoute(
+                        builder: (context) => IdentitySignOutPage());
                 }
               },
             );

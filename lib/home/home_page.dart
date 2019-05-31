@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_aws_app/authentication/authentication.dart';
-import 'package:flutter_aws_app/packages/graphql_api.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_aws_app/home/home.dart';
+import 'package:flutter_aws_app/packages/query_repository.dart';
 import 'package:flutter_aws_app/packages/repository.dart';
-import 'package:flutter_aws_app/identity/identity.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 // This widget is the home page of your application. It is stateful, meaning
 // that it has a State object (defined below) that contains fields that affect
@@ -24,39 +24,40 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  IdentityRepository _identityRepository;
+  QueryRepository _queryRepository;
   AuthenticationBloc _authenticationBloc;
+  HomeBloc _homeBloc;
   int _counter = 0;
 
   @override
   void initState() {
-    _identityRepository = RepositoryProvider.of<IdentityRepository>(context);
+    _queryRepository = RepositoryProvider.of<QueryRepository>(context);
     _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
+    _homeBloc = HomeBloc(queryRepository: _queryRepository);
+    _homeBloc.dispatch(Initialize());
+//    _homeBloc.dispatch(Fetch(
+//      (b) => b
+//        ..operationName = "listPets"
+//        ..query = """
+//      query listPets {
+//        listPets {
+//          id
+//          price
+//          type
+//        }
+//      }
+//    """,
+//    ));
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _homeBloc.dispose();
+    super.dispose();
+  }
+
   void _incrementCounter() async {
-
-    // Get Credentials for the currently signed in user.
-    var credentials = await _identityRepository.credentials;
-    print(credentials.toJson());
-
-    // Create a GraphQL Query.
-    var graphqlEndpoint = "https://xxxxxxxxxxxxxxxxxxxxxxxxxx.appsync-api.us-east-1.amazonaws.com";
-    var graphqlQuery = """
-      query listPets {
-        listPets {
-          id
-          price
-          type
-        }
-      }
-    """;
-
-    // Execute the GraphQL Query.
-    var graphqlApi = GraphQLApi(graphqlEndpoint, 'us-east-1');
-    var response = await graphqlApi.post(credentials, 'listPets', graphqlQuery);
-
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -84,7 +85,7 @@ class _HomePageState extends State<HomePage> {
             // the App.build method, and use it to set our appbar title.
             title: Text(widget.title),
             actions: <Widget>[
-              authenticationState is AuthenticationAuthenticated
+              authenticationState is Authenticated
                   ? IconButton(
                       icon: Icon(Icons.person),
                       onPressed: () {
@@ -99,36 +100,45 @@ class _HomePageState extends State<HomePage> {
                     )
             ],
           ),
-          body: Center(
-            // Center is a layout widget. It takes a single child and positions it
-            // in the middle of the parent.
-            child: Column(
-              // Column is also layout widget. It takes a list of children and
-              // arranges them vertically. By default, it sizes itself to fit its
-              // children horizontally, and tries to be as tall as its parent.
-              //
-              // Invoke "debug painting" (press "p" in the console, choose the
-              // "Toggle Debug Paint" action from the Flutter Inspector in Android
-              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-              // to see the wireframe for each widget.
-              //
-              // Column has various properties to control how it sizes itself and
-              // how it positions its children. Here we use mainAxisAlignment to
-              // center the children vertically; the main axis here is the vertical
-              // axis because Columns are vertical (the cross axis would be
-              // horizontal).
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'You have pushed the button this many times:',
-                ),
-                Text(
-                  '$_counter',
-                  style: Theme.of(context).textTheme.display1,
-                ),
-              ],
-            ),
-          ),
+          body: BlocBuilder<HomeEvent, HomeState>(
+              bloc: _homeBloc,
+              builder: (BuildContext context, HomeState queryState) {
+                return ModalProgressHUD(
+                    inAsyncCall: queryState is HomeLoading,
+                    dismissible: false,
+                    opacity: .8,
+                    color: Colors.white,
+                    child: Center(
+                      // Center is a layout widget. It takes a single child and positions it
+                      // in the middle of the parent.
+                      child: Column(
+                        // Column is also layout widget. It takes a list of children and
+                        // arranges them vertically. By default, it sizes itself to fit its
+                        // children horizontally, and tries to be as tall as its parent.
+                        //
+                        // Invoke "debug painting" (press "p" in the console, choose the
+                        // "Toggle Debug Paint" action from the Flutter Inspector in Android
+                        // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+                        // to see the wireframe for each widget.
+                        //
+                        // Column has various properties to control how it sizes itself and
+                        // how it positions its children. Here we use mainAxisAlignment to
+                        // center the children vertically; the main axis here is the vertical
+                        // axis because Columns are vertical (the cross axis would be
+                        // horizontal).
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'You have pushed the button this many times: !!!',
+                          ),
+                          Text(
+                            '$_counter',
+                            style: Theme.of(context).textTheme.display1,
+                          ),
+                        ],
+                      ),
+                    ));
+              }),
           floatingActionButton: FloatingActionButton(
             onPressed: _incrementCounter,
             tooltip: 'Increment',

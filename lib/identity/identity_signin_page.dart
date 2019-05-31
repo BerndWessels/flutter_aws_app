@@ -72,7 +72,7 @@ class _IdentitySignInPageState extends State<IdentitySignInPage> {
             RegExp regExp = new RegExp("code=(.*)");
             token = regExp.firstMatch(url)?.group(1);
             print("token $token - $url");
-            _authenticationBloc.dispatch(Authenticate(code: token));
+            _authenticationBloc.dispatch(Authenticate((b) => b..code = token));
             Navigator.pop(context);
           }
         });
